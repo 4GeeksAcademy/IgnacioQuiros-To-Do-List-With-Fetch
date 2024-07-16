@@ -9,6 +9,11 @@ const ToDoList = () => {
         if (e.key === "Enter" && todo !== "") {
             addToList();
         }
+        else if(e.key === "Enter" && todo === "")
+        {
+            alert("Write something in the input field first");
+            return;
+        }
     };
 
     const addToList = () => {
