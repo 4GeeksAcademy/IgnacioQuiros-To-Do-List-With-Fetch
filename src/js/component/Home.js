@@ -1,19 +1,16 @@
 import React from "react";
 import Footer from "./Footer";
 import Navbar from "./Navbar";
-import Digits from "./Digits";
-import { faLessThanEqual } from "@fortawesome/free-solid-svg-icons/faLessThanEqual";
-
+import ToDoList from "./ToDoList";
 
 //create your first component
 const Home = () => {
 	return (
 		<div className="text-center">
 			<Navbar/>
-			{/* First part of the exercice Digits */}
-			<Digits description="Time Since You Are Here:" inputTimer={false} startOnLoad={true} maxDigits={7} />
-			<hr/>
-			<Digits description="Set Alarm At:" inputTimer={true} startOnLoad={false} maxDigits={5} />
+			<br/>
+			<ToDoList/>
+			<br/><br/><br/><br/>
 			<Footer/>
 		</div>
 	);
