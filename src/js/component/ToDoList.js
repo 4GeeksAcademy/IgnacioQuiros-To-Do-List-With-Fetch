@@ -53,8 +53,7 @@ const ToDoList = () => {
                         {todoList.map((item, index) => (
                             <NewTask key={index} description={item} index={index + 1} eraseTask={() => eraseTask(index)} />
                         ))}
-                        {console.dir("LA LISTA AAA ;", todoList.lenght)}
-                        <p className="pt-5">Tasks left: {todoList.length + 0}</p>
+                        <p className="pt-5">Tasks left: {(todoList.length === 0) ?  "There are no more tasks" : todoList.length + 0}</p>
                     </div>
 
                     <div className="mx-1">
