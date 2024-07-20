@@ -1,18 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import NewTask from "./NewTask";
 
 const ToDoList = () => {
     const [todo, setTodo] = useState("");
     const [todoList, setTodoList] = useState([]);
 
+    useEffect(() => {
+        getTodos();
+    }, []);
+
     const handleKeyDown = (e) => {
-        if (e.key === "Enter" && todo !== "") {
+        if (e.key === "Enter") {
             addToList();
-        }
-        else if(e.key === "Enter" && todo === "")
-        {
+        } else if (e.key === "Enter") {
             alert("Write something in the input field first");
-            return;
         }
     };
 
@@ -21,12 +22,53 @@ const ToDoList = () => {
             alert("Write something in the input field first");
             return;
         }
-        setTodoList([...todoList, todo]);
-        setTodo("");
+        let newTodo = {
+            label: todo,
+            is_done: false
+        };
+        fetch("https://playground.4geeks.com/todo/todos/IgnacioQuiros", {
+            method: "POST",
+            body: JSON.stringify(newTodo),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+            .then(response => response.json())
+            .then((data) => {
+                setTodoList([...todoList, data]);
+            })
+            .catch(() => { console.log("Error Catch Add/POST") });
+
+            setTodo("");
+    };
+
+    const getTodos = () => {
+        fetch("https://playground.4geeks.com/todo/users/IgnacioQuiros", {
+            method: "GET"
+        })
+            .then(response => response.json())
+            .then((data) => {
+                setTodoList(data.todos);
+            })
+            .catch(() => { console.log("Error Catch GET") });
     };
 
     const eraseTask = (index) => {
-        setTodoList(todoList.filter((_, i) => i !== index));
+        let updatedList = todoList.filter((_, i) => i !== index);
+    
+        fetch(`https://playground.4geeks.com/todo/todos/${todoList[index].id}`, {
+            method: "DELETE",
+        })
+            .then(response => {
+                if (response.ok) {
+                    getTodos();
+                } else {
+                    throw new Error('Failed to delete task');
+                }
+            })
+            .catch(error => {
+                console.log("Error Catch DELETE/PUT", error);
+            });
     };
 
     return (
@@ -47,13 +89,13 @@ const ToDoList = () => {
                             <input type="text" className="form-control fs-3" id="exampleInputEmail" placeholder="What should I do?"
                                 value={todo} onChange={(e) => setTodo(e.target.value)} onKeyDown={handleKeyDown} maxLength="40"
                             />
-                            <button className="btn btn-success ms-2 mt-2 px-4" onClick={() => { addToList(); }}>Enter</button>
-                            <button className="btn btn-danger ms-2 mt-2 px-4" onClick={() => { setTodo(""); }}>Clear</button>
-                        </div>
-                        {todoList.map((item, index) => (
-                            <NewTask key={index} description={item} index={index + 1} eraseTask={() => eraseTask(index)} />
+                            <button className="btn btn-success ms-2 mt-2 px-4" onClick={addToList}>Enter</button>
+                            <button className="btn btn-danger ms-2 mt-2 px-4" onClick={() => setTodo("")}>Clear</button>
+                            </div>
+                        {todoList.map((todo, index) => (
+                            <NewTask description={todo.label} index={index + 1} key={index} eraseTask={() => eraseTask(index)} />
                         ))}
-                        <p className="pt-5">Tasks left: {(todoList.length === 0) ?  "There are no more tasks" : todoList.length + 0}</p>
+                        <p className="pt-5">Tasks left: {todoList.length === 0 ? "There are no more tasks" : todoList.length}</p>
                     </div>
 
                     <div className="mx-1">

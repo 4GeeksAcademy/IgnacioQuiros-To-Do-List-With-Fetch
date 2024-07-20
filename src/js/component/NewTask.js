@@ -8,9 +8,8 @@ const NewTask = ({ description, index, eraseTask }) => {
             <div className="row align-items-center">
                 <p className="index col-1 fs-2 text-secondary m-0 me-2 p-0 justify-content-center 
                 align-items-center">
-                    {index}
+                     {index} 
                 </p>
-
                 <div className="col-10 d-flex justify-content-between border border-5 bg-light 
                 my-3 pe-0 pe-sm-2 description-container">
                     <p className="fs-4 px-sm-3 px-0 pt-3 description">{description}</p>
