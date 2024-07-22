@@ -54,34 +54,36 @@ const ToDoList = () => {
     };
 
     const eraseTask = (index) => {
-        //Delete only one if it has 1 Index, and if it doesnt have it delete all then
+        //Delete only 1 if we have it index but all tasks if not
         if (index != null) {
             fetch(`https://playground.4geeks.com/todo/todos/${todoList[index].id}`, {
                 method: "DELETE",
             })
-                .then(() => {
+            .then(response => {
+                if (response.ok) {
                     getTodos();
-                })
-                .catch(error => console.error(error + "eraseTask"));
-        }
-        else {
-            const deleteAllTasks = (tasks, callback) => {
-                if (tasks.length === 0) {
-                    callback();
-                    return;
+                } else {
+                    throw new Error('Failed to delete task');
                 }
-
-                const task = tasks[0];
-                fetch(`https://playground.4geeks.com/todo/todos/${task.id}`, {
+            })
+            .catch(error => console.error(error));
+        } else {
+            const deletePromises = todoList.map(task => {
+                return fetch(`https://playground.4geeks.com/todo/todos/${task.id}`, {
                     method: "DELETE",
+                });
+            });
+    
+            Promise.all(deletePromises)
+                .then(responses => {
+                    const allSuccessful = responses.every(response => response.ok);
+                    if (allSuccessful) {
+                        getTodos();
+                    } else {
+                        throw new Error('Failed to delete one or more tasks');
+                    }
                 })
-                    .then(() => {
-                        deleteAllTasks(tasks.slice(1), callback);
-                    })
-                    .catch(error => console.error(error + "eraseAllTasks"));
-            };
-
-            deleteAllTasks(todoList, getTodos);
+                .catch(error => console.error(error));
         }
     };
 
