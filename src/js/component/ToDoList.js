@@ -64,18 +64,12 @@ const ToDoList = () => {
             })
             .catch(error => console.error(error));
         } else {
-            const deletePromises = todoList.map(task => {
+            todoList.map(task => {
                 return fetch(`https://playground.4geeks.com/todo/todos/${task.id}`, {
                     method: "DELETE",
                 });
             });
-    
-            Promise.all(deletePromises)
-                .then(responses => {
-                    const allSuccessful = responses.every((response) => response.ok);
-                    getTodos();
-                })
-                .catch(error => console.error(error));
+            getTodos();
         }
     };
 
