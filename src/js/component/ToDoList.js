@@ -4,6 +4,7 @@ import NewTask from "./NewTask";
 const ToDoList = () => {
     const [todo, setTodo] = useState("");
     const [todoList, setTodoList] = useState([]);
+    const myUrlTodos = "https://playground.4geeks.com/todo/"
 
     useEffect(() => {
         getTodos();
@@ -26,24 +27,19 @@ const ToDoList = () => {
             label: todo,
             is_done: false
         };
-        fetch("https://playground.4geeks.com/todo/todos/IgnacioQuiros", {
+        fetch(myUrlTodos + "todos/IgnacioQuiros", {
             method: "POST",
             body: JSON.stringify(newTodo),
-            headers: {
-                "Content-Type": "application/json"
-            }
+            headers: {"Content-Type": "application/json"}
         })
             .then(response => response.json())
-            .then((data) => {
-                setTodoList([...todoList, data]);
-            })
+            .then((data) => { setTodoList([...todoList, data]); })
             .catch(() => { console.log("Error Catch Add/POST") });
-
         setTodo("");
     };
 
     const getTodos = () => {
-        fetch("https://playground.4geeks.com/todo/users/IgnacioQuiros", {
+        fetch(myUrlTodos + "users/IgnacioQuiros", {
             method: "GET"
         })
             .then(response => response.json())
@@ -54,22 +50,24 @@ const ToDoList = () => {
     };
 
     const eraseTask = (index) => {
-        //Delete only 1 if we have it index but all tasks if not
+        //Delete only 1 if it has index but all tasks if index is null
         if (index != null) {
-            fetch(`https://playground.4geeks.com/todo/todos/${todoList[index].id}`, {
+            fetch(myUrlTodos + `todos/${todoList[index].id}`, {
                 method: "DELETE",
             })
-            .then(() => {
+                .then(() => {
                     getTodos();
-            })
-            .catch(error => console.error(error));
+                })
+                .catch(error => console.error(error));
         } else {
             todoList.map(task => {
-                return fetch(`https://playground.4geeks.com/todo/todos/${task.id}`, {
+                return fetch(myUrlTodos + `todos/${task.id}`, {
                     method: "DELETE",
-                });
-            });
-            getTodos();
+                })
+                .then(() => {
+                    getTodos();
+                })
+            })
         }
     };
 
@@ -84,8 +82,7 @@ const ToDoList = () => {
                         <hr className="container col-8 col-sm-6 col-md-5 mb-4" />
                     </div>
                     <div className="p-4 rounded-2 mx-0 mx-sm-4 pb-5" style={{
-                        backgroundColor: "#F7F3CB",
-                        position: "relative", zIndex: 2
+                        backgroundColor: "#F7F3CB", position: "relative", zIndex: 2
                     }}>
                         <div>
                             <input type="text" className="form-control fs-3" id="exampleInputEmail" placeholder="What should I do?"
@@ -95,6 +92,11 @@ const ToDoList = () => {
                             <button className="btn btn-danger ms-2 mt-2 px-4" onClick={() => setTodo("")}>Clear</button>
                             <button className="btn btn-danger ms-2 mt-2 px-4" onClick={() => eraseTask()}>Erase All Tasks</button>
                         </div>
+                        <div className="row d-flex justify-content-center mt-3">
+                         <input type="text" className="col-4 fs-5 border rounded-3" id="exampleInputEmail" placeholder="Filter tasks here:"
+                                // value={todo} onChange={(e) => setTodo(e.target.value)} maxLength="40"
+                            /> 
+                            </div>
                         {todoList.map((todo, index) => (
                             <NewTask description={todo.label} index={index + 1} key={index} eraseTask={() => eraseTask(index)} />
                         ))}
@@ -103,13 +105,11 @@ const ToDoList = () => {
 
                     <div className="mx-1">
                         <div className="p-3 rounded-2 mx-0 mx-sm-4" style={{
-                            backgroundColor: "#E7E2B8", marginTop: "-26px",
-                            position: "relative", zIndex: 1
+                            backgroundColor: "#E7E2B8", marginTop: "-26px", position: "relative", zIndex: 1
                         }}></div>
                         <div className="mx-1">
                             <div className="p-3 rounded-2 mx-0 mx-sm-4" style={{
-                                backgroundColor: "#D3CEA2", marginTop: "-26px",
-                                position: "relative", zIndex: 0
+                                backgroundColor: "#D3CEA2", marginTop: "-26px", position: "relative", zIndex: 0
                             }}></div>
                         </div>
                     </div>
