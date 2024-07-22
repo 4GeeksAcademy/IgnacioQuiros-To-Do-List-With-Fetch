@@ -39,7 +39,7 @@ const ToDoList = () => {
             })
             .catch(() => { console.log("Error Catch Add/POST") });
 
-            setTodo("");
+        setTodo("");
     };
 
     const getTodos = () => {
@@ -54,21 +54,35 @@ const ToDoList = () => {
     };
 
     const eraseTask = (index) => {
-        let updatedList = todoList.filter((_, i) => i !== index);
-    
-        fetch(`https://playground.4geeks.com/todo/todos/${todoList[index].id}`, {
-            method: "DELETE",
-        })
-            .then(response => {
-                if (response.ok) {
-                    getTodos();
-                } else {
-                    throw new Error('Failed to delete task');
-                }
+        //Delete only one if it has 1 Index, and if it doesnt have it delete all then
+        if (index != null) {
+            fetch(`https://playground.4geeks.com/todo/todos/${todoList[index].id}`, {
+                method: "DELETE",
             })
-            .catch(error => {
-                console.log("Error Catch DELETE/PUT", error);
-            });
+                .then(() => {
+                    getTodos();
+                })
+                .catch(error => console.error(error + "eraseTask"));
+        }
+        else {
+            const deleteAllTasks = (tasks, callback) => {
+                if (tasks.length === 0) {
+                    callback();
+                    return;
+                }
+
+                const task = tasks[0];
+                fetch(`https://playground.4geeks.com/todo/todos/${task.id}`, {
+                    method: "DELETE",
+                })
+                    .then(() => {
+                        deleteAllTasks(tasks.slice(1), callback);
+                    })
+                    .catch(error => console.error(error + "eraseAllTasks"));
+            };
+
+            deleteAllTasks(todoList, getTodos);
+        }
     };
 
     return (
@@ -91,7 +105,8 @@ const ToDoList = () => {
                             />
                             <button className="btn btn-success ms-2 mt-2 px-4" onClick={addToList}>Enter</button>
                             <button className="btn btn-danger ms-2 mt-2 px-4" onClick={() => setTodo("")}>Clear</button>
-                            </div>
+                            <button className="btn btn-danger ms-2 mt-2 px-4" onClick={() => eraseTask()}>Erase All Tasks</button>
+                        </div>
                         {todoList.map((todo, index) => (
                             <NewTask description={todo.label} index={index + 1} key={index} eraseTask={() => eraseTask(index)} />
                         ))}
