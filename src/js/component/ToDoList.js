@@ -59,12 +59,8 @@ const ToDoList = () => {
             fetch(`https://playground.4geeks.com/todo/todos/${todoList[index].id}`, {
                 method: "DELETE",
             })
-            .then(response => {
-                if (response.ok) {
+            .then(() => {
                     getTodos();
-                } else {
-                    throw new Error('Failed to delete task');
-                }
             })
             .catch(error => console.error(error));
         } else {
@@ -76,12 +72,8 @@ const ToDoList = () => {
     
             Promise.all(deletePromises)
                 .then(responses => {
-                    const allSuccessful = responses.every(response => response.ok);
-                    if (allSuccessful) {
-                        getTodos();
-                    } else {
-                        throw new Error('Failed to delete one or more tasks');
-                    }
+                    const allSuccessful = responses.every((response) => response.ok);
+                    getTodos();
                 })
                 .catch(error => console.error(error));
         }
