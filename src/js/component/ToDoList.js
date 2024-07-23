@@ -4,6 +4,7 @@ import NewTask from "./NewTask";
 const ToDoList = () => {
     const [todo, setTodo] = useState("");
     const [todoList, setTodoList] = useState([]);
+    const [filter, setFilter] = useState("");
     const myUrlTodos = "https://playground.4geeks.com/todo/"
 
     useEffect(() => {
@@ -30,7 +31,7 @@ const ToDoList = () => {
         fetch(myUrlTodos + "todos/IgnacioQuiros", {
             method: "POST",
             body: JSON.stringify(newTodo),
-            headers: {"Content-Type": "application/json"}
+            headers: { "Content-Type": "application/json" }
         })
             .then(response => response.json())
             .then((data) => { setTodoList([...todoList, data]); })
@@ -64,12 +65,17 @@ const ToDoList = () => {
                 return fetch(myUrlTodos + `todos/${task.id}`, {
                     method: "DELETE",
                 })
-                .then(() => {
-                    getTodos();
-                })
+                    .then(() => {
+                        getTodos();
+                    })
             })
         }
     };
+
+    //Extra filter function
+    const filteredList = todoList.filter(
+        task => task.label.toLowerCase().includes(filter.toLowerCase())
+    );
 
     return (
         <div className="mx-2 mb-5">
@@ -89,15 +95,14 @@ const ToDoList = () => {
                                 value={todo} onChange={(e) => setTodo(e.target.value)} onKeyDown={handleKeyDown} maxLength="40"
                             />
                             <button className="btn btn-success ms-2 mt-2 px-4" onClick={addToList}>Enter</button>
-                            <button className="btn btn-danger ms-2 mt-2 px-4" onClick={() => setTodo("")}>Clear</button>
-                            <button className="btn btn-danger ms-2 mt-2 px-4" onClick={() => eraseTask()}>Erase All Tasks</button>
+                            <button className="btn btn-danger ms-2 mt-2 px-4" onClick={() => { setTodo(""); setFilter("") }}>Clear Inputs</button>
+                            <button className="btn btn-danger ms-2 mt-2 px-4" onClick={() => eraseTask()}> Erase All Tasks</button>
                         </div>
                         <div className="row d-flex justify-content-center mt-3">
-                         <input type="text" className="col-4 fs-5 border rounded-3" id="exampleInputEmail" placeholder="Filter tasks here:"
-                                // value={todo} onChange={(e) => setTodo(e.target.value)} maxLength="40"
-                            /> 
-                            </div>
-                        {todoList.map((todo, index) => (
+                            <input type="text" className="col-4 border rounded-3" id="filterInput" placeholder="Filter tasks here:"
+                                value={filter} onChange={(e) => setFilter(e.target.value)} maxLength="40" />
+                        </div>
+                        {filteredList.map((todo, index) => (
                             <NewTask description={todo.label} index={index + 1} key={index} eraseTask={() => eraseTask(index)} />
                         ))}
                         <p className="pt-5">Tasks left: {todoList.length === 0 ? "There are no more tasks" : todoList.length}</p>
