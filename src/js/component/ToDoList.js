@@ -7,9 +7,30 @@ const ToDoList = () => {
     const [filter, setFilter] = useState("");
     const myUrlTodos = "https://playground.4geeks.com/todo/"
 
+    //First it compares if my user is created since this api keep deleting it,
+    // and then get the to-dos we have saved
     useEffect(() => {
-        getTodos();
+        createUser(); 
     }, []);
+
+    const createUser = () => {
+        fetch(myUrlTodos + "users/IgnacioQuiros", {
+            method: "GET"
+        })
+        .then(response => {
+            if (response.status === 404) {
+                return fetch(myUrlTodos + "users/IgnacioQuiros", {
+                    method: "POST"
+                });
+            } else if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Error veryfing user');
+            }
+        })
+        getTodos();
+    };
+
 
     const handleKeyDown = (e) => {
         if (e.key === "Enter") {
